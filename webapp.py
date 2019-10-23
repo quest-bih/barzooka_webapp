@@ -36,24 +36,14 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db.init_app(app)
 
 # For job handling
-app.config['RQ_REDIS_URL'] = os.environ['RQ_REDIS_URL']
-rq = RQ(app)
+#app.config['RQ_REDIS_URL'] = os.environ['RQ_REDIS_URL']
+#rq = RQ(app)
 
 # For monitoring papers (until Biorxiv provides a real API)
 app.config['TWITTER_APP_KEY'] = os.environ['TWITTER_APP_KEY']
 app.config['TWITTER_APP_SECRET'] = os.environ['TWITTER_APP_SECRET']
 app.config['TWITTER_KEY'] = os.environ['TWITTER_KEY']
 app.config['TWITTER_SECRET'] = os.environ['TWITTER_SECRET']
-
-# for author notification
-app.config['MAIL_SERVER'] = os.environ['MAIL_SERVER']
-app.config['MAIL_PORT'] = int(os.environ['MAIL_PORT'])
-app.config['MAIL_USE_TLS'] = bool(int(os.environ['MAIL_USE_TLS']))
-app.config['MAIL_USERNAME'] = os.environ['MAIL_USERNAME']
-app.config['MAIL_PASSWORD'] = os.environ['MAIL_PASSWORD']
-app.config['MAIL_DEFAULT_SENDER'] = os.environ['MAIL_DEFAULT_SENDER'].replace("'", "")
-app.config['MAIL_REPLY_TO'] = os.environ['MAIL_REPLY_TO'].replace("'", "")
-app.config['MAIL_MAX_EMAILS'] = int(os.environ['MAIL_MAX_EMAILS'])
 
 app.config['DEBUG'] = os.environ.get('DEBUG', 0)
 
@@ -67,8 +57,6 @@ tweepy_auth = tweepy.OAuthHandler(
 tweepy_auth.set_access_token(
     app.config['TWITTER_KEY'], app.config['TWITTER_SECRET'])
 tweepy_api = tweepy.API(tweepy_auth)
-
-mail = Mail(app)
 
 @app.route('/')
 def home():
@@ -100,17 +88,6 @@ def pages(paper_id, prepost=1, maxshow=10):
 
     pages = record.pages
     page_count = record.page_count
-
-    # Unused, reconsider later...?
-    # # find pages before and after (requested or default)
-    # try:
-    #     prepost = math.fabs(int(flask.request.args.get('prepost')))
-    # except:
-    #     pass
-    # try:
-    #     maxshow = math.fabs(int(flask.request.args.get('maxshow')))
-    # except:
-    #     pass
 
     # if requested, show all pages with each page's status
     try:
@@ -237,37 +214,7 @@ def toggle_status(paper_id):
     else:
         return flask.jsonify(result=False, message="not logged in")
 
-"""
-@app.route('/rerun', methods=['GET', 'POST'])
-@app.route('/rerun/<string:paper_id>', methods=['POST'])
-def rerun_web(paper_id=None):
-    ""Requeue jobs from the web interface
 
-    If only a single paper, then do this synchronously.
-    If all (i.e. paper_id == None), then do this on the queue
-    to avoid delaying the redirect.
-
-    ""
-    if flask.session.get('logged_in'):
-        if paper_id is None:
-            _rerun.queue(paper_id)
-            flask.flash("Rerun job has been queued")
-            return flask.redirect('/')
-        else:
-            n_queue = _rerun(paper_id)
-            if n_queue == -1:
-                message = "Paper not found"
-            else:
-                message = "Paper has been queued"
-
-            if flask.request.method == 'GET':
-                flask.flash(message)
-                return flask.redirect('/')
-            return flask.jsonify(result=n_queue != -1, message=message)
-    else:
-        flask.flash("Not logged in")
-        return flask.redirect('/login')
-"""
 
 @app.route('/login', methods=['GET', 'POST'])
 def admin_login():
@@ -344,8 +291,8 @@ def parse_tweet(t, db=db, objclass=Biorxiv, verbose=True):
     db.session.commit()
 
     # Only add to queue if not yet processed
-    if obj.parse_status == 0:
-        process_paper.queue(obj)
+    #if obj.parse_status == 0:
+    #    process_paper.queue(obj)
 
 
 @app.cli.command()
@@ -359,15 +306,16 @@ def retrieve_timeline(count):
         parse_tweet(t)
 
 
+"""
 @rq.job(timeout='30m')
 def process_paper(obj):
-    """Processes paper starting from url/code
-
-    1. get object, find page count and posted date
-    3. detect rainbow
-    3. if rainbow, get authors
-    4. update database entry with colormap detection and author info
-    """
+    #Processes paper starting from url/code
+    #
+    #1. get object, find page count and posted date
+    #2. detect rainbow
+    #3. if rainbow, get authors
+    #4. update database entry with colormap detection and author info
+    
     obj = db.session.merge(obj)
     if obj.page_count == 0:
         obj.page_count = count_pages(obj.id)
@@ -384,7 +332,7 @@ def process_paper(obj):
 
     db.session.merge(obj)
     db.session.commit()
-
+"""
 
 ## NOTE: NEEDS WORK
 @pytest.fixture()
@@ -405,7 +353,7 @@ def test_integration(test_setup_cleanup):
     Check for written authors.
     """
 
-    testq = rq.Queue('testq', is_async=False)
+    #testq = rq.Queue('testq', is_async=False)
 
     preobj = Test(id='172627v1')
     testq.enqueue(process_paper, preobj)
