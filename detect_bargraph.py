@@ -10,6 +10,8 @@ import subprocess
 import glob
 import itertools
 
+from fastai.vision import *
+
 try:
     import numpy as np
     import pandas as pd
@@ -242,6 +244,7 @@ def test_detect_rainbow_from_iiif():
     else:
         print("FYI, the jet image on page 1 isn't detected")
 
+
 def detect_rainbow_from_iiif(paper_id, pages, debug=False):
     """Pull images from iiif server
     """
@@ -253,6 +256,59 @@ def detect_rainbow_from_iiif(paper_id, pages, debug=False):
     df = pd.concat(data, ignore_index=True, copy=False)
 
     return detect_rainbow_from_colors(df)
+
+
+
+
+def detect_graph_types_from_iiif(paper_id, pages, learner, debug=False):
+    """Pull images from iiif server
+    """
+
+    print(paper_id, pages)
+
+    url = "https://iiif-biorxiv.saladi.org/iiif/2/biorxiv:{}.full.pdf/full/560,560/0/default.png?page={}"
+    images = [open_image(io.BytesIO(requests.get(url.format(paper_id, pg)).content)) for pg in range(1, pages+1)]
+    
+    return detect_graph_types_from_list(images, learner)
+
+
+def detect_graph_types_from_list(images, learner, type='bar'):
+    """Predicts graph types for each image and returns pages with bar graphs
+    """
+    page_predictions = np.array([predict_graph_type(images[idx], learner) for idx in range(0, len(images))])
+    bar_pages = np.where(page_predictions == type)[0] + 1 #add 1 to page idx such that page counting starts at 1
+
+    return bar_pages.tolist()
+
+
+def predict_graph_type(img, learner):
+    """Use fastai model on each image to predict types of pages
+    """
+    class_names = {
+        "0": ["approp"],
+        "1": ["bar"],
+        "2": ["bardot"],
+        "3": ["box"],
+        "4": ["dot"],
+        "5": ["hist"],
+        "6": ["other"],
+        "7": ["pie"],
+        "8": ["text"],
+        "9": ["violin"]
+    }
+    
+    pred_class,pred_idx,outputs = learner.predict(img)
+    
+    if pred_idx.sum().tolist() == 0: #if there is no predicted class 
+        #(=no class over threshold) give out class with highest prediction probability
+        highest_pred = str(np.argmax(outputs).tolist())
+        pred_class = class_names[highest_pred]
+    else: 
+        pred_class = pred_class.obj #extract class name as text
+        
+    return(pred_class)
+
+
 
 
 def main():

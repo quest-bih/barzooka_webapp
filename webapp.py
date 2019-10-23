@@ -21,8 +21,11 @@ import pytest
 
 from models import db, Biorxiv, Test
 from biorxiv_scraper import find_authors, find_date, count_pages
-from detect_cmap import detect_rainbow_from_iiif
+from detect_bargraph import detect_rainbow_from_iiif, detect_graph_types_from_iiif
 import utils
+
+from fastai.vision import *
+learn = load_learner(path='.', file='export.pkl')
 
 # Reads env file into environment, if found
 _ = utils.read_env()
@@ -248,6 +251,18 @@ def handle_csrf_error(e):
     return flask.redirect(flask.url_for('admin_login'))
 
 
+
+@app.cli.command()
+@click.option('--count', default=5)
+def retrieve_timeline(count):
+    """Picks up current timeline (for testing)
+    """
+    for t in tweepy.Cursor(tweepy_api.user_timeline,
+            screen_name='biorxivpreprint', trim_user='True',
+            include_entities=True, tweet_mode='extended').items(count):
+        parse_tweet(t)
+
+
 def parse_tweet(t, db=db, objclass=Biorxiv, verbose=True):
     """Parses tweets for relevant data,
        writes each paper to the database,
@@ -291,23 +306,10 @@ def parse_tweet(t, db=db, objclass=Biorxiv, verbose=True):
     db.session.commit()
 
     # Only add to queue if not yet processed
-    #if obj.parse_status == 0:
-    #    process_paper.queue(obj)
+    if obj.parse_status == 0:
+        process_paper(obj)
 
 
-@app.cli.command()
-@click.option('--count', default=500)
-def retrieve_timeline(count):
-    """Picks up current timeline (for testing)
-    """
-    for t in tweepy.Cursor(tweepy_api.user_timeline,
-            screen_name='biorxivpreprint', trim_user='True',
-            include_entities=True, tweet_mode='extended').items(count):
-        parse_tweet(t)
-
-
-"""
-@rq.job(timeout='30m')
 def process_paper(obj):
     #Processes paper starting from url/code
     #
@@ -315,13 +317,16 @@ def process_paper(obj):
     #2. detect rainbow
     #3. if rainbow, get authors
     #4. update database entry with colormap detection and author info
-    
+  
     obj = db.session.merge(obj)
+
     if obj.page_count == 0:
         obj.page_count = count_pages(obj.id)
+
     if obj.posted_date == "":
         obj.posted_date = find_date(obj.id)
-    obj.pages, obj.parse_data = detect_rainbow_from_iiif(obj.id, obj.page_count)
+
+    obj.pages = detect_graph_types_from_iiif(obj.id, obj.page_count, learn)
 
     if len(obj.pages) > 0:
         obj.parse_status = 1
@@ -332,7 +337,7 @@ def process_paper(obj):
 
     db.session.merge(obj)
     db.session.commit()
-"""
+
 
 ## NOTE: NEEDS WORK
 @pytest.fixture()
