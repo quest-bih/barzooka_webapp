@@ -36,7 +36,7 @@
 
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-  <title>Fighting the Jet</title>
+  <title>Fighting Bargraphs</title>
 
   <script>
       function toggleDiv(id) {
@@ -68,61 +68,14 @@
 
   <div class="jumbotron" style="border-radius: 5px 5px 0 0; margin-top:15px; padding-top:25px; padding-bottom:25px; margin-bottom:0px;">
 
-    <h4 class="display-4">Fighting against Rainbow Colormaps everywhere!</h4>
+    <h4 class="display-4">Barzooka - Fighting against bargraphs for continuous data!</h4>
     <hr/>
     <div class="row">
       <div class="col-md-8">
         <p class="lead" style="margin-bottom:1.5em; font-size: 120%;">
-            Scientists co-opt our visual system to convey numerical data in a format that's easily understandable using spatial and color variation to capture details of the underlying data. A “colormap” transforms the set of numbers into a pattern of plotted colors.
-            </br></br>
-            When done poorly, this transformation introduces well-established visual artifacts and obscures the underlying detail. Furthermore, certain colormaps create images that are inaccessible to readers with anomalous color vision (i.e. colorblindness).
-            </br></br>
-            Unfortunately, widely-used rainbow colormaps, like "jet", face these issues but are pervasive in the scientific literature. Jetfighter aims to prevent this by detecting problematic colormaps in publicly available pre-print manuscripts and then contacting the authors, if necessary.
-            </br></br>
-            Explore recently screened manuscripts here, and check out a companion website that provides a solution for published figures, <a href="http://fixthejet.caltech.edu">fixthejet.caltech.edu</a>, as well!
+            Detection of bar graphs for continuous data in BioRxiv preprints.
           </p>
       </div>
-      <div class="col-md-4 mx-auto text-center align-self-center">
-        <div class="row"><div class="col">
-          <a href="https://elifesciences.org/labs/c2292989/jetfighter-towards-figure-accuracy-and-accessibility"
-            target="_blank">
-            <img src="https://iiif.elifesciences.org/journal-cms/labs_experiment/2019-04/art-circles-close-up-view-90911_0.jpg/full/250,/270/default.webp"
-                  class="img-fluid" alt="Rainbow pipes"/>
-            <br>Check out the tech behind JetFighter!
-          </a>
-        </div></div>
-        <br>
-        <div class="row"><div class="col">
-          <button type="button" class="btn btn-outline-dark" onclick="toggleDiv('moreinfo');this.remove();">Colormap resources</button>
-          <div id="moreinfo" style="display: none; font-size: 85%;">
-            <div class="list-group">
-                <a href="https://jakevdp.github.io/blog/2014/10/16/how-bad-is-your-colormap/"
-                  target="_blank" class="list-group-item list-group-item-action">
-                  How bad is your colormap?
-                </a>
-                <a href="https://predictablynoisy.com/makeitpop-intro"
-                  target="_blank" class="list-group-item list-group-item-action">
-                  makeitpop, a tool to perceptually warp your data
-                </a>
-                <a href="https://blogs.mathworks.com/steve/2014/10/20/a-new-colormap-for-matlab-part-2-troubles-with-rainbows/"
-                  target="_blank" class="list-group-item list-group-item-action">
-                  A new colormap for MATLAB
-                </a>
-                <a href="https://bids.github.io/colormap/"
-                  target="_blank" class="list-group-item list-group-item-action">
-                  The making of viridis
-                </a>
-                <a href="http://idl.cs.washington.edu/papers/quantitative-color"
-                  target="_blank" class="list-group-item list-group-item-action">
-                  An empirical assessment of quantitative colormaps
-                </a>
-                <a href="http://fixthejet.caltech.edu"
-                  target="_blank" class="list-group-item list-group-item-action">
-                  fixthejet: An online colormap converter
-                </a>
-            </div>
-          </div>
-        </div></div>
       </div>
     </div>
   </div>

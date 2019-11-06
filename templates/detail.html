@@ -48,7 +48,7 @@
         <td class="align-right">Parse status</td>
         <td>
           {% if parse_status > 0 %}
-            Problematic colors/colormap detected
+            Bar graphs detected
             <tr>
                 <td class="align-right">Page(s) detected/worth revisiting</td>
                 <td>{{ pages }}</td>
@@ -64,7 +64,7 @@
                 {% endif %}
             </tr>
           {% elif parse_status < 0 %}
-            No problematic colors/colormap detected
+            No bar graphs detected
           {% else %}
             Not yet screened
           {% endif %}

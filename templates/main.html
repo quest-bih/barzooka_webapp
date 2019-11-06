@@ -3,7 +3,7 @@
 {% block content %}
 
 <nav class="navbar navbar-expand-lg navbar-dark sticky-top bg-dark rounded-bottom" style="margin:0px; margin-bottom:20px;">
-  <a class="navbar-brand" href="#">Jet Fighting!</a>
+  <a class="navbar-brand" href="#">Bar graph detection.</a>
 
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -15,8 +15,8 @@
           <a class="nav-link" href="/">All Manuscripts</a>
         </li>
         <li class="navbar-text nav-item">
-          <a class="nav-link" href="?categories=1,2">Manuscripts with rainbow detection
-            <i class="far fa-eye-slash detected"></i>
+          <a class="nav-link" href="?categories=1,2">Manuscripts with bar graph detection
+            <i class="fas fa-signal detected"></i>
           </a>
         </li>
         <li class="navbar-text nav-item">
@@ -86,7 +86,7 @@
 
         <td class="text-center align-middle">
           {% if p.parse_status > 0 %}
-          <i class="far fa-eye-slash detected"></i>
+          <i class="fas fa-signal detected"></i>
           {% elif p.parse_status < 0 %}
           <i class="far fa-check-circle notdetected"></i>
           {% endif %}
