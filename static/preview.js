@@ -29,7 +29,7 @@ function retrieve_previews(id, all_pages = false) {
       pvt
         .find("img")
         .hide()
-        .attr("src", "https://iiif-biorxiv.saladi.org/iiif/2/biorxiv:" + id + ".pdf/full/250,/0/default.jpg?page=" + pg)
+        .attr("src", "http://localhost:8182/iiif/2/biorxiv:" + id + ".pdf/full/250,/0/default.jpg?page=" + pg)
         .on("load", function() {
           $(this).show().parent().find(".placeholder").remove();
         });
