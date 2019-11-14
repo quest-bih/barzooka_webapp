@@ -266,7 +266,7 @@ def detect_graph_types_from_iiif(paper_id, pages, learner, debug=False):
 
     print(paper_id, pages)
 
-    url = "https://iiif-biorxiv.saladi.org/iiif/2/biorxiv:{}.full.pdf/full/560,560/0/default.png?page={}"
+    url = "http://127.0.0.1:8182/iiif/2/biorxiv:{}.full.pdf/full/560,560/0/default.png?page={}"
     images = [open_image(io.BytesIO(requests.get(url.format(paper_id, pg)).content)) for pg in range(1, pages+1)]
     
     return detect_graph_types_from_list(images, learner)

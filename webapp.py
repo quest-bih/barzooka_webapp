@@ -24,6 +24,7 @@ from biorxiv_scraper import find_authors, find_date, count_pages
 from detect_bargraph import detect_rainbow_from_iiif, detect_graph_types_from_iiif
 import utils
 
+os.environ['NO_PROXY'] = '127.0.0.1' #needed to access local iiif server for the bargraph detection
 from fastai.vision import *
 learn = load_learner(path='.', file='export.pkl')
 
@@ -257,13 +258,21 @@ def handle_csrf_error(e):
 def retrieve_timeline(count):
     """Picks up current timeline (for testing)
     """
+    # as we currently have to wait for a long time until the parsing is done
+    # go through tweets twice: first only add basic info to SQL database,
+    # second, parse pdf for bargraphs
+    for t in tweepy.Cursor(tweepy_api.user_timeline,
+            screen_name='biorxivpreprint', trim_user='True',
+            include_entities=True, tweet_mode='extended').items(count):
+        parse_tweet(t, process=False)
+
     for t in tweepy.Cursor(tweepy_api.user_timeline,
             screen_name='biorxivpreprint', trim_user='True',
             include_entities=True, tweet_mode='extended').items(count):
         parse_tweet(t)
 
 
-def parse_tweet(t, db=db, objclass=Biorxiv, verbose=True):
+def parse_tweet(t, db=db, objclass=Biorxiv, verbose=True, process=True):
     """Parses tweets for relevant data,
        writes each paper to the database,
        dispatches a processing job to the processing queue (rq)
@@ -305,9 +314,10 @@ def parse_tweet(t, db=db, objclass=Biorxiv, verbose=True):
     obj = db.session.merge(obj)
     db.session.commit()
 
-    # Only add to queue if not yet processed
-    if obj.parse_status == 0:
-        process_paper(obj)
+    # Only add to queue if not yet processed and if we actually want to do all the processing
+    if process == True:
+        if obj.parse_status == 0:
+            process_paper(obj)
 
 
 def process_paper(obj):
