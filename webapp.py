@@ -25,6 +25,7 @@ from detect_bargraph import detect_rainbow_from_iiif, detect_graph_types_from_ii
 import utils
 
 os.environ['NO_PROXY'] = '127.0.0.1' #needed to access local iiif server for the bargraph detection
+
 from fastai.vision import *
 learn = load_learner(path='.', file='export.pkl')
 
@@ -336,9 +337,19 @@ def process_paper(obj):
     if obj.posted_date == "":
         obj.posted_date = find_date(obj.id)
 
-    obj.pages = detect_graph_types_from_iiif(obj.id, obj.page_count, learn)
+    class_pages = detect_graph_types_from_iiif(obj.id, obj.page_count, learn)
 
-    if len(obj.pages) > 0:
+    obj.pages = class_pages["bar"]
+    obj.pages_pie = class_pages["pie"]
+    obj.pages_hist = class_pages["hist"]
+    obj.pages_bardot = class_pages["bardot"]
+    obj.pages_box = class_pages["box"]
+    obj.pages_dot = class_pages["dot"]
+    obj.pages_violin = class_pages["violin"]
+    obj.pages_positive = class_pages["positive"]
+
+
+    if (len(obj.pages) + len(obj.pages_pie)) > 0:
         obj.parse_status = 1
         if obj.author_contact is None:
             obj.author_contact = find_authors(obj.id)

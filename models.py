@@ -18,6 +18,13 @@ class Biorxiv(db.Model):
     parse_status    = db.Column(db.Integer, default=0, nullable=False)
     _parse_data     = db.Column('parse_data', db.String)
     _pages          = db.Column('pages', db.String, default='[]', nullable=False)
+    _pages_pie      = db.Column('pages_pie', db.String, default='[]', nullable=False)
+    _pages_hist     = db.Column('pages_hist', db.String, default='[]', nullable=False)
+    _pages_bardot   = db.Column('pages_bardot', db.String, default='[]', nullable=False)
+    _pages_box      = db.Column('pages_box', db.String, default='[]', nullable=False)
+    _pages_dot      = db.Column('pages_dot', db.String, default='[]', nullable=False)
+    _pages_violin   = db.Column('pages_violin', db.String, default='[]', nullable=False)
+    _pages_positive = db.Column('pages_positive', db.String, default='[]', nullable=False)
     page_count      = db.Column('page_count', db.Integer, default=0, nullable=False)
     posted_date     = db.Column(db.String(10), default='')
     _author_contact = db.Column('author_contact', db.String)
@@ -41,6 +48,73 @@ class Biorxiv(db.Model):
     @pages.setter
     def pages(self, lst):
         self._pages = json.dumps(lst)
+
+
+
+    @hybrid_property
+    def pages_pie(self):
+        return json.loads(self._pages_pie)
+
+    @pages_pie.setter
+    def pages_pie(self, lst):
+        self._pages_pie = json.dumps(lst)
+
+
+    @hybrid_property
+    def pages_hist(self):
+        return json.loads(self._pages_hist)
+
+    @pages_hist.setter
+    def pages_hist(self, lst):
+        self._pages_hist = json.dumps(lst)
+
+
+    @hybrid_property
+    def pages_bardot(self):
+        return json.loads(self._pages_bardot)
+
+    @pages_bardot.setter
+    def pages_bardot(self, lst):
+        self._pages_bardot = json.dumps(lst)
+
+
+    @hybrid_property
+    def pages_box(self):
+        return json.loads(self._pages_box)
+
+    @pages_box.setter
+    def pages_box(self, lst):
+        self._pages_box = json.dumps(lst)
+
+
+    @hybrid_property
+    def pages_dot(self):
+        return json.loads(self._pages_dot)
+
+    @pages_dot.setter
+    def pages_dot(self, lst):
+        self._pages_dot = json.dumps(lst)
+
+
+    @hybrid_property
+    def pages_violin(self):
+        return json.loads(self._pages_violin)
+
+    @pages_violin.setter
+    def pages_violin(self, lst):
+        self._pages_violin = json.dumps(lst)
+
+
+    @hybrid_property
+    def pages_positive(self):
+        return json.loads(self._pages_positive)
+
+    @pages_positive.setter
+    def pages_positive(self, lst):
+        self._pages_positive = json.dumps(lst)
+
+
+
 
     @hybrid_property
     def pages_str(self):
