@@ -283,7 +283,10 @@ def detect_graph_types_from_list(images, learner):
     box_pages = np.where(page_predictions == 'box')[0] + 1
     dot_pages = np.where(page_predictions == 'dot')[0] + 1
     violin_pages = np.where(page_predictions == 'violin')[0] + 1
-    positive_pages = hist_pages + bardot_pages + box_pages + dot_pages + violin_pages
+    positive_pages = hist_pages.tolist() + bardot_pages.tolist() + box_pages.tolist() + dot_pages.tolist() + violin_pages.tolist()
+    if len(positive_pages) > 0:
+        positive_pages = list(set(positive_pages)) #remove duplicates and sort
+        positive_pages.sort()
 
     class_pages = dict();  
     class_pages['bar'] = bar_pages.tolist()
@@ -293,7 +296,7 @@ def detect_graph_types_from_list(images, learner):
     class_pages['box'] = box_pages.tolist()
     class_pages['dot'] = dot_pages.tolist()
     class_pages['violin'] = violin_pages.tolist()
-    class_pages['positive'] = positive_pages.tolist()
+    class_pages['positive'] = positive_pages
     
 
     return class_pages
