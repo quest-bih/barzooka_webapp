@@ -18,8 +18,13 @@ except:
 def baseurl(code):
     return 'https://www.biorxiv.org/content/10.1101/{}'.format(code)
 
+def req_internal(url):
+    http = urllib3.PoolManager(cert_reqs='CERT_NONE')
+    page = http.request('get', url, timeout=120)
+    return page.data.decode('utf-8')
+
 def req(url):
-    http = urllib3.ProxyManager('http://proxy.charite.de:8080/', cert_reqs='CERT_NONE', assert_hostname=False)
+    http = urllib3.PoolManager(cert_reqs='CERT_NONE', assert_hostname=False)
     page = http.request('get', url, timeout=120)
     return page.data.decode('utf-8')
 
@@ -55,9 +60,9 @@ def count_pages(paper_id):
     """cantaloupe iiif server returns the highest page index with an error
     if out of range is requested
     """
-    url = "https://iiif-biorxiv.saladi.org/iiif/2/biorxiv:{}.full.pdf/full/500,/0/default.jpg?page=1000"
+    url = "http://localhost:8182/iiif/2/biorxiv:{}.full.pdf/full/500,/0/default.jpg?page=1000"
     url = url.format(paper_id)
-    page = req(url)
+    page = req_internal(url)
     count = re_pg.findall(page)[0]
     return int(count)
 
