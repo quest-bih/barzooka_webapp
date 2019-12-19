@@ -41,8 +41,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db.init_app(app)
 
 # For job handling
-#app.config['RQ_REDIS_URL'] = os.environ['RQ_REDIS_URL']
-#rq = RQ(app)
+app.config['RQ_REDIS_URL'] = os.environ['RQ_REDIS_URL']
+rq = RQ(app)
 
 # For monitoring papers (until Biorxiv provides a real API)
 app.config['TWITTER_APP_KEY'] = os.environ['TWITTER_APP_KEY']
@@ -265,15 +265,10 @@ def retrieve_timeline(count):
     for t in tweepy.Cursor(tweepy_api.user_timeline,
             screen_name='biorxivpreprint', trim_user='True',
             include_entities=True, tweet_mode='extended').items(count):
-        parse_tweet(t, process=False)
-
-    for t in tweepy.Cursor(tweepy_api.user_timeline,
-            screen_name='biorxivpreprint', trim_user='True',
-            include_entities=True, tweet_mode='extended').items(count):
         parse_tweet(t)
 
 
-def parse_tweet(t, db=db, objclass=Biorxiv, verbose=True, process=True):
+def parse_tweet(t, db=db, objclass=Biorxiv, verbose=True):
     """Parses tweets for relevant data,
        writes each paper to the database,
        dispatches a processing job to the processing queue (rq)
@@ -316,48 +311,48 @@ def parse_tweet(t, db=db, objclass=Biorxiv, verbose=True, process=True):
     db.session.commit()
 
     # Only add to queue if not yet processed and if we actually want to do all the processing
-    if process == True:
-        if obj.parse_status == 0:
-            process_paper(obj)
+    if obj.parse_status == 0:
+        process_paper.queue(obj)
 
 
+@rq.job(timeout='30m')
 def process_paper(obj):
     #Processes paper starting from url/code
     #
     #1. get object, find page count and posted date
-    #2. detect rainbow
-    #3. if rainbow, get authors
-    #4. update database entry with colormap detection and author info
-  
-    obj = db.session.merge(obj)
+    #2. detect graph classes
+    #3. if bargraph, get authors
+    #4. update database entry with graph detection and author info
+    with app.app_context():
+        obj = db.session.merge(obj)
 
-    if obj.page_count == 0:
-        obj.page_count = count_pages(obj.id)
+        if obj.page_count == 0:
+            obj.page_count = count_pages(obj.id)
 
-    if obj.posted_date == "":
-        obj.posted_date = find_date(obj.id)
+        if obj.posted_date == "":
+            obj.posted_date = find_date(obj.id)
 
-    class_pages = detect_graph_types_from_iiif(obj.id, obj.page_count, learn)
+        class_pages = detect_graph_types_from_iiif(obj.id, obj.page_count, learn)
 
-    obj.pages = class_pages["bar"]
-    obj.pages_pie = class_pages["pie"]
-    obj.pages_hist = class_pages["hist"]
-    obj.pages_bardot = class_pages["bardot"]
-    obj.pages_box = class_pages["box"]
-    obj.pages_dot = class_pages["dot"]
-    obj.pages_violin = class_pages["violin"]
-    obj.pages_positive = class_pages["positive"]
+        obj.pages = class_pages["bar"]
+        obj.pages_pie = class_pages["pie"]
+        obj.pages_hist = class_pages["hist"]
+        obj.pages_bardot = class_pages["bardot"]
+        obj.pages_box = class_pages["box"]
+        obj.pages_dot = class_pages["dot"]
+        obj.pages_violin = class_pages["violin"]
+        obj.pages_positive = class_pages["positive"]
 
 
-    if (len(obj.pages) + len(obj.pages_pie)) > 0:
-        obj.parse_status = 1
-        if obj.author_contact is None:
-            obj.author_contact = find_authors(obj.id)
-    else:
-        obj.parse_status = -1
+        if (len(obj.pages) + len(obj.pages_pie)) > 0:
+           obj.parse_status = 1
+           if obj.author_contact is None:
+                obj.author_contact = find_authors(obj.id)
+        else:
+            obj.parse_status = -1
 
-    db.session.merge(obj)
-    db.session.commit()
+        db.session.merge(obj)
+        db.session.commit()
 
 
 ## NOTE: NEEDS WORK
