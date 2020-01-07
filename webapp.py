@@ -132,31 +132,19 @@ def show_details(paper_id, prepost=1, maxshow=10):
         flask.flash('Sorry! Results with that ID have not been found')
         return flask.redirect('/')
 
-    # Format colormap for viewing
-    df_cm = record.parse_data
-    if df_cm.size > 0:
-        df_cm['fn'] = df_cm['fn'].astype(str)
-        if df_cm['fn'].str.contains('-').any():
-            df_cm['fn'] = df_cm['fn'].str.split('-', n=1).str[1]
-        df_cm['pct_cm'] = df_cm['pct_cm'] * 100
-        df_cm['pct_page'] = df_cm['pct_page'] * 100
-    df_cm = df_cm[['cm', 'fn', 'pct_cm', 'pct_page']]
-    df_cm.rename(columns={
-        'fn': 'Page',
-        'cm': 'Colormap Abbreviation',
-        'pct_cm': 'Colormap Coverage (%)',
-        'pct_page': 'Page Coverage (%)',
-    }, inplace=True)
-
-    cm_table = df_cm.to_html(bold_rows=False, index=False, border=0,
-        table_id="cm_parse_table", float_format='%.2f')
 
     # display images
     return flask.render_template('detail.html',
         paper_id=record.id, title=record.title, url=record.url,
         pages=", ".join([str(p) for p in record.pages]),
-        parse_status=record.parse_status, email_sent=record.email_sent,
-        cm_parse_html=cm_table
+        pages_pie=", ".join([str(p) for p in record.pages_pie]),
+        pages_bardot=", ".join([str(p) for p in record.pages_bardot]),
+        pages_box=", ".join([str(p) for p in record.pages_box]),
+        pages_hist=", ".join([str(p) for p in record.pages_hist]),
+        pages_dot=", ".join([str(p) for p in record.pages_dot]),
+        pages_violin=", ".join([str(p) for p in record.pages_violin]),
+        pages_positive=", ".join([str(p) for p in record.pages_positive]),
+        parse_status=record.parse_status, email_sent=record.email_sent
         )
 
 @app.route('/notify/<string:paper_id>', methods=['POST'])
