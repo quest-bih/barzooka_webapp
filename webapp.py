@@ -21,7 +21,7 @@ import pytest
 
 from models import db, Biorxiv, Test
 from biorxiv_scraper import find_authors, find_date, count_pages
-from detect_bargraph import detect_rainbow_from_iiif, detect_graph_types_from_iiif
+from detect_bargraph import detect_graph_types_from_iiif
 import utils
 
 os.environ['NO_PROXY'] = '127.0.0.1' #needed to access local iiif server for the bargraph detection
