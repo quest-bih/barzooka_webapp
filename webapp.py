@@ -24,8 +24,6 @@ from biorxiv_scraper import find_authors, find_date, count_pages
 from detect_bargraph import detect_graph_types_from_iiif
 import utils
 
-os.environ['NO_PROXY'] = '127.0.0.1' #needed to access local iiif server for the bargraph detection
-
 from fastai.vision import *
 learn = load_learner(path='.', file='export.pkl')
 
