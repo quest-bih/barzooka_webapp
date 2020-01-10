@@ -93,19 +93,3 @@ def predict_graph_type(img, learner):
         
     return(pred_class)
 
-
-
-
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('pdf_file')
-    parser.add_argument('--debug', action='store_true')
-    args = parser.parse_args()
-
-    has_rainbow, data = detect_rainbow_from_file(args.pdf_file, args.debug)
-    print('Has rainbow:', has_rainbow)
-
-    return
-
-if __name__ == '__main__':
-    main()
