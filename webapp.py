@@ -12,6 +12,8 @@ from flask_rq2 import RQ
 from flask_mail import Mail, Message
 from flask_wtf.csrf import CSRFProtect, CSRFError
 
+from waitress import serve
+
 from sqlalchemy import desc
 
 import tweepy
@@ -75,7 +77,7 @@ def home():
     papers = (Biorxiv.query
                      .filter(Biorxiv.parse_status.in_(cats))
                      .order_by(desc(Biorxiv.created))
-                     .limit(500)
+                     .limit(5000)
                      .all())
 
     return flask.render_template('main.html', app=app, papers=papers)
@@ -241,7 +243,7 @@ def handle_csrf_error(e):
 
 
 @app.cli.command()
-@click.option('--count', default=5)
+@click.option('--count', default=500)
 def retrieve_timeline(count):
     """Picks up current timeline (for testing)
     """
@@ -378,4 +380,5 @@ def test_integration(test_setup_cleanup):
         'g.stan@imperial.ac.uk', 't.ellis@imperial.ac.uk'])
 
 if __name__ == "__main__":
-    app.run(debug=True, threaded=True, use_reloader=True)
+    #app.run(debug=True, threaded=True, use_reloader=True)
+    serve(app, host='127.0.0.1', port=5000, url_scheme='https')
