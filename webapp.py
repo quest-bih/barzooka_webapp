@@ -27,7 +27,8 @@ from detect_bargraph import detect_graph_types_from_iiif
 import utils
 
 from fastai.vision import *
-learn = load_learner(path='.', file='export.pkl')
+#ml_path = os.environ['WEBAPP_PATH']
+learn = load_learner(path='/data01/webapp/barzooka/', file='export.pkl')
 
 # Reads env file into environment, if found
 _ = utils.read_env()

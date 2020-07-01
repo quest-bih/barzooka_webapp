@@ -63,6 +63,7 @@
       <th>Date Posted</th>
       <th>Paper Link</th>
       <th>Parse Status</th>
+      <!--<th>Informative graphs</th>-->
       {% if session['logged_in'] %}
         <th>Actions</th>
       {% else %}
@@ -92,6 +93,14 @@
           {% endif %}
         </td>
 
+      <!--  <td class="text-center align-middle">
+          {% if p.pages_positive|length > 0 %}
+          <i class="far fa-check-circle informdetected"></i>
+          {% elif p.pages_positive|length == 0 %}
+          <i class="far fa-close informnotdetected"></i>
+          {% endif %}
+        </td>
+-->
         <td class="text-center align-middle" style="color:black">
           {% if session['logged_in'] %}
             {% if p.parse_status > 0 %}
