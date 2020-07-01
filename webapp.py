@@ -78,7 +78,7 @@ def home():
     papers = (Biorxiv.query
                      .filter(Biorxiv.parse_status.in_(cats))
                      .order_by(desc(Biorxiv.created))
-                     .limit(5000)
+                     .limit(2000)
                      .all())
 
     return flask.render_template('main.html', app=app, papers=papers)
